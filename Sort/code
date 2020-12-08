@@ -1,0 +1,495 @@
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+///输出数组
+void PrintArr(int arr[], int len);
+
+///冒泡排序
+void bubble_sort(int *arr, int len);
+
+///简单选择排序
+void SelectionSort(int arr[], int n);
+
+///直接插入法
+//  1.大的值往后移，确定当前值的位置之后在插进去
+void Insertion_Sort(int *arr, int len);
+
+void Insertion_Sort01(int *arr, int len);
+
+void Insertion_Sort02(int *arr, int len);
+
+//  2. 不断交换,差评
+void Insertion_Sort03(int *arr, int len);
+
+///希尔排序
+void ShellSort(int *arr, int len);
+
+void ShellSort02(int *arr, int len);
+
+void ShellSort03(int *arr, int len);
+
+///堆排序
+void HeapSort(int *arr, int len);
+
+void HeapAdjust(int *arr, int len, int e);
+
+///归并排序
+//  1. 递归
+void MergeSort(int arr[], int len);
+
+void MSort(int arr[], int l, int r);
+
+void Merge(int arr[], int l, int mid, int r);
+
+//  2. 非递归(共用Merge函数)
+void MergeSort02(int arr[], int len);
+
+void MergePass(int arr[], int k, int len);
+
+///快速排序法
+void QuickSort(int arr[], int len);
+
+void QSort(int arr[], int start, int end);
+
+int Partition(int arr[], int start, int end);
+
+int Partition02(int a[], int i, int j);
+
+int Partition03(int arr[], int start, int end);
+
+#define MAX_LENGTH_INSERT_Sort  15
+
+int main()
+{
+    int arr[] = {7, 8, 0, 20, 6, 3, 7, 16, 1, 5, 9, 4, 2, 9, 1, 10, 11, 6, 12};
+    int len = sizeof(arr) / sizeof(arr[0]);
+    PrintArr(arr, len);
+
+    bubble_sort(arr, len);
+    SelectionSort(arr, len);
+    Insertion_Sort(arr, len);
+    ShellSort(arr, len);
+    HeapSort(arr, len);
+    MergeSort(arr, len);
+    MergeSort02(arr, len);
+    QuickSort(arr, len);
+
+    PrintArr(arr, len);
+
+    return 0;
+}
+
+void PrintArr(int arr[], int len)
+{
+    for (int i = 0; i < len; i++)
+        cout << arr[i] << "  ";
+    cout << endl;
+}
+
+void bubble_sort(int *arr, int len)
+{
+    for (int i = len - 1; i > 0; i--)
+    {
+        for (int j = 0; j < i; j++)
+        {
+            if (arr[j] > arr[j + 1])
+            {
+                swap(arr[j], arr[j + 1]);
+            }
+        }
+    }
+}
+
+void SelectionSort(int arr[], int n)
+{
+    int i, j, min;
+    for (i = 0; i < n - 1; i++)
+    {
+        min = i;
+        for (j = i + 1; j < n; j++)
+        {
+            if (arr[min] > arr[j])
+                min = j;
+            if (min != i)
+            {
+                int tmp = arr[i];
+                arr[i] = arr[min];
+                arr[min] = tmp;
+            }
+        }
+    }
+}
+
+void QuickSort(int arr[], int len)
+{
+    if (len < MAX_LENGTH_INSERT_Sort)
+    {
+        cout << "Choose InsertSort!" << endl;
+        Insertion_Sort(arr, len);
+    } else
+    {
+        cout << "Choose QuickSort!" << endl;
+        QSort(arr, 0, len - 1);
+    }
+}
+
+void QSort(int arr[], int start, int end)
+{
+    if (start < end)
+    {
+        int p = Partition03(arr, start, end);
+        QSort(arr, start, p);
+        QSort(arr, p + 1, end);
+    }
+}
+
+/**尾递归优化*/
+//void QSort(int arr[],int start,int end)
+//{
+//    while(start<end)
+//    {
+//        int p = Partition03(arr,start,end);
+//        QSort(arr,start,p);
+//        start=p+1;
+//    }
+//}
+
+int Partition(int arr[], int start, int end)
+{
+    int pivotValue = arr[start];
+    while (start < end)
+    {
+        while (start < end && arr[end] >= pivotValue)
+            end--;
+        int tmp = arr[end];
+        arr[end] = arr[start];
+        arr[start] = tmp;
+
+        while (start < end && arr[start] <= pivotValue)
+            start++;
+        tmp = arr[end];
+        arr[end] = arr[start];
+        arr[start] = tmp;
+    }
+    return start;
+}
+
+
+int Partition02(int a[], int i, int j)
+{
+    int p = a[i]; // p 是枢纽
+    int m = i; // S1 和 S2 一开始是空的
+    for (int k = i + 1; k <= j; k++)
+    { // 探索未知的区域
+        if (a[k] < p)
+        { // case 2
+            m++;
+            swap(a[k], a[m]); // C++ STL algorithm std::swap
+        } // 注意：在情况1的时候我们什么不做: a[k] >= p
+    }
+    swap(a[i], a[m]); // 最后一步, 用a[m]交换枢纽
+    return m; // 返回枢纽的指数, 用于快速排序（Quick Sort）
+}
+
+int Partition03(int arr[], int start, int end)
+{
+    //优化：三数取中
+    int mid = (start + end) / 2;
+    if (arr[start] > arr[end])
+    {
+        swap(arr[start], arr[end]);
+    }
+    if (arr[mid] > arr[end])
+    {
+        swap(arr[mid], arr[end]);
+    }
+    if (arr[mid] > arr[start])
+    {
+        swap(arr[mid], arr[start]);
+    }
+    int pivotValue = arr[start];
+    int pivotPosition = start;
+    // Rearrange the rest of the array elements to partition the subrange from start to end
+    for (int Pos = start + 1; Pos <= end; Pos++)
+    {
+        if (pivotValue > arr[Pos])
+        {
+            // arr[scan] is the "current" item.
+            // Swap the current item with the item to the
+            // right of the pivot element
+            swap(arr[pivotPosition + 1], arr[Pos]);
+            // Swap the current item with the pivot element
+            swap(arr[pivotPosition], arr[pivotPosition + 1]);
+            // Adjust the pivot position so it stays with the
+            // pivot element
+            pivotPosition++;
+        }
+    }
+    return pivotPosition;
+}
+
+
+void Insertion_Sort(int *arr, int len)
+{
+    for (int i = 1; i < len; i++)
+    {
+        int tmp = arr[i];
+        int j = i - 1;
+        while (arr[j] > tmp && j >= 0)
+        {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = tmp;
+    }
+}
+
+void Insertion_Sort01(int *arr, int len)
+{
+    int tmp, mid;
+    for (int i = 1; i < len; i++)
+    {
+        int left = 0;
+        int right = i - 1;
+        tmp = arr[i];
+        while (left <= right)
+        {
+            mid = (left + right) / 2;
+            if (arr[mid] > tmp)
+                right = mid - 1;
+            else
+                left = mid + 1;
+        }
+//        if(arr[left]>tmp)
+        {
+            for (int j = i - 1; j > right; j--)
+            {
+                arr[j + 1] = arr[j];
+            }
+            arr[left] = tmp;
+        }
+    }
+}
+
+void Insertion_Sort02(int *arr, int len)
+{
+    for (int i = 1; i < len; i++)
+    {
+        int tmp = arr[i];
+        int j;
+        for (j = i - 1; arr[j] > tmp && j >= 0; j--)
+        {
+            arr[j + 1] = arr[j];
+        }
+        arr[j + 1] = tmp;
+    }
+}
+
+void InsertSort03(int arr[], int n)
+{
+    for (int i = 1; i < n; i++)
+    {
+        for (int j = i; j > 0; j--)
+        {
+            if (arr[j] < arr[j - 1])
+            {
+                int temp = arr[j];
+                arr[j] = arr[j - 1];
+                arr[j - 1] = temp;
+            }
+        }
+    }
+}
+
+void ShellSort(int *arr, int len)
+{
+    int increment = len / 2;
+    while (increment >= 1)
+    {
+        for (int i = increment; i < len; i++)
+        {
+            if (arr[i] < arr[i - increment])
+            {
+                int tmp = arr[i];
+                int j = i - increment;
+                while (arr[j] > tmp && j >= 0)
+                {
+                    arr[j + increment] = arr[j];
+                    j -= increment;
+                }
+                arr[j + increment] = tmp;
+            }
+        }
+        increment = increment / 2;
+    }
+}
+
+
+void ShellSort02(int *arr, int len)
+{
+    for (int increment = len / 2; increment > 0; increment /= 2)
+    {
+        for (int i = increment; i < len; i++)
+        {
+            if (arr[i] < arr[i - increment])
+            {
+                int tmp = arr[i];
+                int j;
+                for (j = i - increment; arr[j] > tmp && j >= 0; j -= increment)
+                {
+                    arr[j + increment] = arr[j];
+                }
+                arr[j + increment] = tmp;
+            }
+        }
+    }
+}
+
+void ShellSort03(int arr[], int len)
+{
+    for (int gap = len / 2; gap > 0; gap /= 2)
+    {
+        for (int i = gap; i < len; i++)
+        {
+            int temp = arr[i];
+            int j;
+            for (j = i - gap; arr[j] > temp && j >= 0; j -= gap)
+            {
+                if (arr[j] > temp)
+                {
+                    arr[j + gap] = arr[j];
+                }
+            }
+            arr[j + gap] = temp;
+        }
+
+    }
+}
+
+void HeapAdjust(int *arr, int len, int e)
+{
+    //先保存要调整位置的值
+    int tmp = arr[e];
+    //找位置
+    //从j结点的左子结点开始，也就是2j+1处开始
+    for (int j = e * 2 + 1; j < len; j = j * 2 + 1)
+    {
+        if (j + 1 < len && arr[j] < arr[j + 1])
+        {
+            j++;
+        }
+        if (tmp >= arr[j])
+            break;
+        arr[e] = arr[j];
+        e = j;   // 选取孩子结点的左孩子结点,继续向下筛选
+    }
+    //被筛选的结点放入最终位置
+    arr[e] = tmp;
+}
+
+void HeapSort(int *arr, int len)
+{
+    //1. 整体作排序  构建初始大顶堆
+    for (int i = len / 2 - 1; i >= 0; i--)
+    {
+        HeapAdjust(arr, len, i);
+
+    }
+    //2. 调整堆结构+交换堆顶元素与末尾元素
+    for (int j = len - 1; j > 0; j--)
+    {
+        //交换
+        int tmp = arr[j];
+        arr[j] = arr[0];
+        arr[0] = tmp;
+
+        HeapAdjust(arr, j, 0);
+    }
+}
+
+
+void Merge(int arr[], int l, int mid, int r)
+{
+    int tmp[r - l + 1];
+    int i = l, j = mid + 1, k = 0;
+    while (i <= mid && j <= r)
+    {
+        if (arr[i] <= arr[j])
+        {
+            tmp[k] = arr[i];
+            k++;
+            i++;
+        } else
+        {
+            tmp[k] = arr[j];
+            k++;
+            j++;
+        }
+    }
+    while (i <= mid)
+    {
+        tmp[k] = arr[i];
+        i++;
+        k++;
+    }
+    while (j <= r)
+    {
+        tmp[k] = arr[j];
+        j++;
+        k++;
+    }
+
+    for (int m = 0; m < k; m++)
+    {
+        arr[m + l] = tmp[m];
+    }
+}
+
+void MSort(int arr[], int l, int r)
+{
+    if (l < r)
+    {
+        int mid = (l + r) / 2;
+        MSort(arr, l, mid);
+        MSort(arr, mid + 1, r);
+        Merge(arr, l, mid, r);
+    }
+
+}
+
+void MergeSort(int arr[], int len)
+{
+
+    MSort(arr, 0, len - 1);
+}
+
+void MergePass(int arr[], int k, int len)
+{
+    int l = 0;
+    while (l + 2 * k - 1 < len)
+    {
+        int mid = l + k - 1;
+        int r = l + 2 * k - 1;
+        Merge(arr, l, mid, r);
+        l = r + 1;
+    }
+    if (l < len - k + 1)
+    {
+        Merge(arr, l, l + k, len - 1);
+    } else
+    {
+
+    }
+}
+
+void MergeSort02(int arr[], int len)
+{
+    int k = 1;
+    while (k < len)
+    {
+        MergePass(arr, k, len);
+        k = k * 2;
+    }
+}
