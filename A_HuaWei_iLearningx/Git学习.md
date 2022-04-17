@@ -1,3 +1,5 @@
+git 学习文档：https://git-scm.com/docs
+
 ## 上传仓库
 
 1. github 新建项目
@@ -10,13 +12,13 @@
 
 4. 本地文件夹内容修改
 
-5. `git add .`
+5. `git add .`      （也可以只选择某和文件或文件夹）   <font color=green>=> 将工作区修改的数据放到暂存区</font>
 
-6. `git commit -m "自己的注释"`
+6. `git commit -m "自己的注释"`    <font color=green>=> 将暂存区的内容提交到版本去</font>
 
-7. `git remote add origin git@github.com:mengyao-wang/Note.git`
+7. `git remote add origin git@github.com:mengyao-wang/Note.git`    (可能只是第一次用这样，之后就不用了)
 
-8. `git push -u origin "分支名"`
+8. `git push -u origin "分支名"`       <font color=green>=> 将形成版本的内容提交到远程仓库上</font>>
 
     eg.  git push -u origin main
 
@@ -37,6 +39,14 @@
     Connection to github.com closed.
 
     （2）再去git push -u origin "分支名"即可。
+
+
+
+- <font face="黑体" color=blue size=4>问题： git push之后，网页的github里，文件夹上面有向右的白色箭头，且打不开</font>
+
+    原因：检查本地文件夹中是否有.git/子文件夹，这将意味着该文件夹(本地)是一个<font color=green>嵌套Git存储库</font>
+
+    解决：进入上一级目录里，删掉git
 
 
 
@@ -99,13 +109,17 @@
 
 
 
-git branch -a  没有远程分支，解决：先执行 git fetch
+<font color=>git branch -a  没有远程分支，解决：先执行 git fetch
 
 删除远程分支，git push origin --delete  "远程分支名"
 
 ### 切换分支
 
+`git branch (分支名)`     创建分支
+
 ` git checkout (branch) `   切换到要修改的分支
+
+` git checkout -b (branch) `   创建并切换到要修改的分支，相当于上面两句
 
 
 
